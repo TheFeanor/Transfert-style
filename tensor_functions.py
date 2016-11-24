@@ -7,17 +7,11 @@ def tensor_norm(A, is_square_norm):
     else:
         out = normA
 
-    with tf.Session() as sess:
-        result = tf.run(out)
-
-    return result
+    return out
 
 
 def tensor_distance(A, B, is_square_norm):
     substraction = tf.sub(A, B)
     distance = tensor_norm(substraction, is_square_norm=)
 
-    with tf.Session() as sess:
-        result = tf.run(distance)
-
-    return result
+    return distance
