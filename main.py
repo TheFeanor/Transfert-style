@@ -59,4 +59,11 @@ with tf.device('/cpu:0'):
         style_loss = [tf.reduce_mean(art_output_distance[i] \
                         for i in np.arange(5)]
 
-        total_loss = alpha*content_loss + beta*style_loss
+        total_loss = sess.run(alpha*content_loss + beta*style_loss)
+
+        # minimization of the loss
+        opimizer = tf.train.GradientDescentOptimizer(0.5)
+        train = optimizer.minimize(total_loss)
+
+        for step in np.arange(1000):
+            sess.run(train)
