@@ -14,7 +14,11 @@ photo_batch = photo.reshape((1,224,224,3))
 art_batch   = art.reshape((1,224,224,3))
 
 #creating a noisy output
-#output = np.random.rand((1,224,224,3))
+output = np.random.rand(1,224,224,3).astype(np.float32)
+
+#ratios structure vs style
+alpha = 1
+beta = 1
 
 with tf.device('/cpu:0'):
 
@@ -39,7 +43,8 @@ with tf.device('/cpu:0'):
     # running a session for art piece features extraction
     art_features = sess.run(fetches, feed_dict = art_dict)
 
-    if not photo_features:
-        print("no photo")
-    if not art_features:
-        print("no art")
+    # running a session for the output
+    out_dict = {image : output}
+    out_features = sess.run(fetches, feed_dict = out_dict)
+
+    # losses for each layer
