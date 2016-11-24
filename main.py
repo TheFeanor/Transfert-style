@@ -1,12 +1,13 @@
 #-*- coding:utf-8 -*-
 
 import numpy as np
-import pandas as pd
 import tensorflow as tf
-import tensorflow-vgg.vgg19 as vgg
-import matplotlib as plt
-import cv
+from custom-VGG import Vgg19
+import utils
+
+photo = utils.load_image("./Images/argetine.jpg")
+art   = utils.load_image("./Images/nuit_etoilee.jpg")
 
 if __name__ = '__main__':
     npy_path = 'tensorflow-vgg/'
-    vgg19 = vgg.Vgg19(npy_path)
+    CNN = Vgg19(npy_path)
