@@ -2,7 +2,7 @@
 
 import numpy as np
 import tensorflow as tf
-from custom-VGG import Vgg19
+from custom_VGG import Vgg19
 import utils
 
 #loading images
