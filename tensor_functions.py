@@ -1,38 +1,23 @@
-def tensor_norm(A, is_square_norm):
-    """
-    Computes de L2-norm (Euclian norm) for a feature map A.
-    The parameters is_square_norm denotes wether the output is the norm
-    or the square norm.
-    """
-    squareA = tf.sqare(A)
-    normA = tf.sum(squareA)
-
-    if is_square_norm:
-        out = tf.square(normA)
-    else:
-        out = normA
-
-    return out
+from np.linalg import norm
 
 
-def tensor_distance(A, B, is_square_norm):
+def features_distance(A, B, is_square_norm):
     """
     Computes the Euclidian distance between two features maps A and B.
     The parameters is_square_norm denotes wether the output is the distance
     or the square distance.
     """
-    substraction = tf.sub(A, B)
-    distance = tensor_norm(substraction, is_square_norm)
+    distance = norm(A - B)**2
 
     return distance
 
 
-def response_correlation(A, B):
+def responses_correlation(A, B):
     """
     Computes de Gram matrix correlation between two filter responses A and B
     """
-    product = tf.mul(A, B)
-    gram = tf.sum(product)
+    product = A*B
+    gram = np.sum(product)
 
     return gram
 
@@ -41,13 +26,12 @@ def style_representation(A):
     """
     Computes the style representation of the feature map A.
     """
+    shape_A = A.shape
+    Gram = np.zeros(shape_A[1], shape_A[2])
 
-    shape = tf.get_shape(A)
-    Gram = np.zeros(shape[1:3])
-
-    for i in np.arange(shape[1]):
-        for j in np.arange(shape[2]):
+    for i in np.arange(shape_A[3]):
+        for j in np.arange(shape_A[3]):
             # computes correlation between response of filter i and j
-            Gram[i,j] = response_correlation(A[i,:,:,:], A[j,:,:,:])
+            Gram[i,j] = responses_correlation(A[:,:,:,i], A[:,:,:,j])
 
-    return tf.convert_to_tensor(Gram, dtype=tf.float32)
+    return Gram
