@@ -66,3 +66,25 @@ def structure_error(features_p, features_x, layer_index):
     E = 0.5 * norm(P - F)**2
 
     return E
+
+
+def alpha_reg(x, alpha, lambd):
+    """
+    Computes alpha-norm-regularisation term with weight lambd
+    """
+    norm_a = np.power(norm(x, alpha), alpha)
+
+    return lambd * norm_a
+
+
+def TV_reg(x, beta, lambd):
+    """
+    Computes TV-regularisation term with power beta/2 and weight lambd
+    """
+    grad = np.gradient(x)
+    gx = grad[0]
+    gy = grad[1]
+    beta2 = np.float(beta)/2
+    norm_b = np.sum(np.power(gx**2 + gy**2, beta2))
+
+    return lambd * norm_b
