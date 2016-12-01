@@ -96,3 +96,16 @@ class Vgg19:
 
     def get_bias(self, name):
         return tf.constant(self.data_dict[name][1], name="biases")
+
+    def backpropagation(self, loss, n_layer, x):
+        """
+        Compute backpropagation at layer n_layer
+        loss : loss to minimize
+        n_layer : index of the layer where to backpropagate the gradient
+        x : the image to modify
+        x_out : the image modified by backpropagation
+        """
+
+
+
+        return x_out

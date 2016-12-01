@@ -3,7 +3,7 @@
 import numpy as np
 import tensorflow as tf
 from custom_VGG import Vgg19
-from tensor_function import *
+from tensor_functions import *
 import utils
 
 #loading images
@@ -48,6 +48,10 @@ with tf.device('/cpu:0'):
         out_dict = {image : output}
         out_features = sess.run(fetches, feed_dict = out_dict)
 
+        for i in np.arange(5):
+            print(photo_features[i].shape)
+            print(type(photo_features[i]))
+
         # losses for each layer
         photo_output_distance = [tensor_distance(out_features[i], \
                                 photo_features[i], True) for i in np.arange(5)]
@@ -62,8 +66,8 @@ with tf.device('/cpu:0'):
         total_loss = sess.run(alpha*content_loss + beta*style_loss)
 
         # minimization of the loss
-        opimizer = tf.train.GradientDescentOptimizer(0.5)
-        train = optimizer.minimize(total_loss)
+        opt = tf.train.GradientDescentOptimizer(learning_rate = 0.5)
+        train = opt.minimize(grads, var_list=output)
 
         for step in np.arange(1000):
             sess.run(train)

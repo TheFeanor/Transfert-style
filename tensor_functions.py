@@ -1,13 +1,13 @@
-from np.linalg import norm
+from numpy.linalg import norm
 
 
-def features_distance(A, B, is_square_norm):
+def features_distance(A, B):
     """
     Computes the Euclidian distance between two features maps A and B.
     The parameters is_square_norm denotes wether the output is the distance
     or the square distance.
     """
-    distance = norm(A - B)**2
+    distance = norm(A-B)**2
 
     return distance
 
@@ -24,7 +24,8 @@ def responses_correlation(A, B):
 
 def style_representation(A):
     """
-    Computes the style representation of the feature map A.
+    Computes the style representation of the feature map A along axis 3 that
+    represents the amount of filter responses.
     """
     shape_A = A.shape
     Gram = np.zeros(shape_A[1], shape_A[2])
