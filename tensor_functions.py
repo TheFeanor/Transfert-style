@@ -46,3 +46,23 @@ def style_error(features_a, features_x, w = np.ones(5)/5):
         E += w[k] / (4* M_I**2 * N_I**2) * norm(A-G)**2
 
     return E
+
+
+def structure_error(features_p, features_x, layer_index):
+    """
+    Computes structure_error based on the definiton of the paper.
+    """
+    E = 0
+
+    P = features_p[layer_index]
+    F = features_x[layer_index]
+
+    N_I = P.shape[3]
+    M_I = P.shape[1] * P.shape[2]
+
+    P = P.reshape(M_I, N_I)
+    F = F.reshape(M_I, N_I)
+
+    E = 0.5 * norm(P - F)**2
+
+    return E
