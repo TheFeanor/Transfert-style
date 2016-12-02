@@ -48,26 +48,20 @@ with tf.device('/cpu:0'):
         out_dict = {image : output}
         out_features = sess.run(fetches, feed_dict = out_dict)
 
-        for i in np.arange(5):
-            print(photo_features[i].shape)
-            print(type(photo_features[i]))
-
         # losses for each layer
-        photo_output_distance = [tensor_distance(out_features[i], \
-                                photo_features[i], True) for i in np.arange(5)]
-        art_output_distance = [tensor_distance(out_features[i], \
-                                art_features, True) for i in np.arange(5)]
-
-        content_loss = [tf.reduce_mean(photo_output_distance[i]) \
-                        for i in np.arange(5)]
-        style_loss = [tf.reduce_mean(art_output_distance[i] \
-                        for i in np.arange(5)]
-
-        total_loss = sess.run(alpha*content_loss + beta*style_loss)
+        style_loss = style_error(art_features, out_features)
+        alpha_loss = alpha_reg(x=output, alpha=6, lambd=2.16e8)
+        beta_loss = TV_reg(x=output, beta=2, lambd=5)
+        total_loss = np.zeros(5) + style_loss + alpha_loss + beta_loss
+        for k in np.arange(5):
+            total_loss[k] += structure_error(photo_features, out_features, k)
 
         # minimization of the loss
-        opt = tf.train.GradientDescentOptimizer(learning_rate = 0.5)
+        l_rate = 0.5
+        decay = 0.9
+        opt = tf.train.GradientDescentOptimizer(total_loss[4], \
+                        learning_rate = l_rate)
         train = opt.minimize(grads, var_list=output)
 
-        for step in np.arange(1000):
+        for step in np.arange(5):
             sess.run(train)

@@ -1,5 +1,5 @@
 from numpy.linalg import norm
-
+import numpy as np
 
 def features_distance(A, B):
     """
@@ -18,7 +18,7 @@ def style_representation(A):
     represents the amount of filter responses.
     """
     shape_A = A.shape
-    Gram = np.zeros(shape_A[1], shape_A[2])
+    Gram = np.zeros((shape_A[1], shape_A[2]))
 
     for i in np.arange(shape_A[3]):
         for j in np.arange(shape_A[3]):

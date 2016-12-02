@@ -1,3 +1,4 @@
 vgg19.npy
+custom_VGG.pyc
 *.pyc
 tensor_test.py
