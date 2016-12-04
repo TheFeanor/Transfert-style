@@ -29,7 +29,6 @@ with tf.device('/cpu:0'):
     with tf.Session() as sess:
 
         #creating a noisy output
-        start = time()
         output = tf.Variable(255*tf.random_uniform([1,224,224,3]))
 
         init = tf.initialize_all_variables()
@@ -73,11 +72,13 @@ with tf.device('/cpu:0'):
             total_loss[k] += structure_error(photo_features, out_features, k)
         print("Loss computation, done !")
 
+        print(tf.trainaible_variables())
+
         # minimization of the loss
         l_rate = 0.5
         decay = 0.9
         opt = tf.train.GradientDescentOptimizer(learning_rate = l_rate)
-        loss = tf.convert_to_tensor(total_loss[layer-1])
+        loss = total_loss[layer-1]
         train = opt.minimize(loss)
         print("Gradient descent construction, done !")
 

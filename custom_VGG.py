@@ -73,7 +73,8 @@ class Vgg19:
         print("build model finished: %ds" % (time.time() - start_time))
 
     def avg_pool(self, bottom, name):
-        return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return tf.Variable(tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], \
+                            strides=[1, 2, 2, 1], padding='SAME', name=name))
 
     def max_pool(self, bottom, name):
         return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
@@ -88,7 +89,7 @@ class Vgg19:
             bias = tf.nn.bias_add(conv, conv_biases)
 
             relu = tf.nn.relu(bias)
-            return relu
+            return tf.Variable(relu)
 
 
     def get_conv_filter(self, name):
@@ -96,16 +97,3 @@ class Vgg19:
 
     def get_bias(self, name):
         return tf.constant(self.data_dict[name][1], name="biases")
-
-    def backpropagation(self, loss, n_layer, x):
-        """
-        Compute backpropagation at layer n_layer
-        loss : loss to minimize
-        n_layer : index of the layer where to backpropagate the gradient
-        x : the image to modify
-        x_out : the image modified by backpropagation
-        """
-
-
-
-        return x_out
