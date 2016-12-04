@@ -17,13 +17,14 @@ def style_representation(A):
     Computes the style representation of the feature map A along axis 3 that
     represents the amount of filter responses.
     """
-    shape_A = A.shape
-    Gram = np.zeros((shape_A[1], shape_A[2]))
+    A = np.squeeze(A)
+    row, col, channel = A.shape
+    Gram = np.zeros((channel, channel))
 
-    for i in np.arange(shape_A[3]):
-        for j in np.arange(shape_A[3]):
+    for i in np.arange(channel):
+        for j in np.arange(channel):
             # computes correlation between response of filter i and j
-            product = A[:,:,:,i] * A[:,:,:,j]
+            product = A[:,:,i] * A[:,:,j]
             Gram[i,j] = np.sum(product)
 
     return Gram
@@ -72,7 +73,8 @@ def alpha_reg(x, alpha, lambd):
     """
     Computes alpha-norm-regularisation term with weight lambd
     """
-    norm_a = np.power(norm(x, alpha), alpha)
+    x = x.reshape((224*224,3))
+    norm_a = np.power(norm(x, ord=alpha), alpha)
 
     return lambd * norm_a
 
