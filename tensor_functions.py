@@ -1,5 +1,6 @@
 from numpy.linalg import norm
 import numpy as np
+import tensorflow as tf
 
 def features_distance(A, B):
     """
@@ -17,15 +18,15 @@ def style_representation(A):
     Computes the style representation of the feature map A along axis 3 that
     represents the amount of filter responses.
     """
-    A = np.squeeze(A)
-    row, col, channel = A.shape
+    A = tf.squeeze(A)
+    channel = A.get_shape()[2]
     Gram = np.zeros((channel, channel))
 
     for i in np.arange(channel):
         for j in np.arange(channel):
             # computes correlation between response of filter i and j
-            product = A[:,:,i] * A[:,:,j]
-            Gram[i,j] = np.sum(product)
+            product = tf.mul(A[:,:,i], A[:,:,j])
+            Gram[i,j] = tf.reduce_sum(product)
 
     return Gram
 
@@ -38,13 +39,14 @@ def style_error(features_a, features_x, w = np.ones(5)/5):
     E = 0
 
     for k in np.arange(5):
-        N_I = features_a[k].shape[3]
-        M_I = features_a[k].shape[1] * features_a[k].shape[2]
+        N_I = features_a[k].get_shape()[3]
+        M_I = features_a[k].get_shape()[1] * features_a[k].get_shape()[2]
 
         A = style_representation(features_a[k])
         G = style_representation(features_x[k])
 
-        E += w[k] / (4* M_I**2 * N_I**2) * norm(A-G)**2
+        E += tf.reduce_sum(w[k] / (4* M_I**2 * N_I**2) * \
+                           tf.squared_difference(A, G))
 
     return E
 
@@ -58,13 +60,13 @@ def structure_error(features_p, features_x, layer_index):
     P = features_p[layer_index]
     F = features_x[layer_index]
 
-    N_I = P.shape[3]
-    M_I = P.shape[1] * P.shape[2]
+    N_I = P.get_shape()[3]
+    M_I = P.get_shape()[1] * P.get_shape()[2]
 
-    P = P.reshape(M_I, N_I)
-    F = F.reshape(M_I, N_I)
+    P = tf.reshape(P, [M_I, N_I])
+    F = tf.reshape(F, [M_I, N_I])
 
-    E = 0.5 * norm(P - F)**2
+    E = 0.5 * tf.reduce_sum(tf.squared_difference(P, F))
 
     return E
 

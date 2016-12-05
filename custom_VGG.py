@@ -73,11 +73,13 @@ class Vgg19:
         print("build model finished: %ds" % (time.time() - start_time))
 
     def avg_pool(self, bottom, name):
-        return tf.Variable(tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], \
-                            strides=[1, 2, 2, 1], padding='SAME', name=name))
+        average =  tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], \
+                            strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return average
 
     def max_pool(self, bottom, name):
-        return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        max_ = tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return max_
 
     def conv_layer(self, bottom, name):
         with tf.variable_scope(name):
@@ -89,7 +91,7 @@ class Vgg19:
             bias = tf.nn.bias_add(conv, conv_biases)
 
             relu = tf.nn.relu(bias)
-            return tf.Variable(relu)
+            return relu
 
 
     def get_conv_filter(self, name):
