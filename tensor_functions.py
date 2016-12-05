@@ -23,10 +23,15 @@ def style_representation(A):
     Gram = []
 
     for i in np.arange(channel):
-        for j in np.arange(channel):
+        for j in np.arange(i, channel, 1):
             # computes correlation between response of filter i and j
             product = tf.mul(A[:,:,i], A[:,:,j])
-            Gram.append(tf.reduce_sum(product))
+            correl = tf.reduce_sum(product)
+            Gram.append(correl)
+            # As Gram matrix is symmetric, one just has to compute what is above
+            # the diagonal once and put it twice in the list
+            if j > i:
+                Gram.append(correl)
 
     return Gram
 
