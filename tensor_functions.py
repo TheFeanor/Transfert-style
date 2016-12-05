@@ -19,14 +19,14 @@ def style_representation(A):
     represents the amount of filter responses.
     """
     A = tf.squeeze(A)
-    channel = A.get_shape()[2]
-    Gram = np.zeros((channel, channel))
+    channel = int(A.get_shape()[2])
+    Gram = []
 
     for i in np.arange(channel):
         for j in np.arange(channel):
             # computes correlation between response of filter i and j
             product = tf.mul(A[:,:,i], A[:,:,j])
-            Gram[i,j] = tf.reduce_sum(product)
+            Gram.append(tf.reduce_sum(product))
 
     return Gram
 
@@ -39,8 +39,9 @@ def style_error(features_a, features_x, w = np.ones(5)/5):
     E = 0
 
     for k in np.arange(5):
-        N_I = features_a[k].get_shape()[3]
-        M_I = features_a[k].get_shape()[1] * features_a[k].get_shape()[2]
+        N_I = int(features_a[k].get_shape()[3])
+        M_I = int(features_a[k].get_shape()[1]) * \
+                int(features_a[k].get_shape()[2])
 
         A = style_representation(features_a[k])
         G = style_representation(features_x[k])
@@ -60,8 +61,8 @@ def structure_error(features_p, features_x, layer_index):
     P = features_p[layer_index]
     F = features_x[layer_index]
 
-    N_I = P.get_shape()[3]
-    M_I = P.get_shape()[1] * P.get_shape()[2]
+    N_I = int(P.get_shape()[3])
+    M_I = int(P.get_shape()[1]) * int(P.get_shape()[2])
 
     P = tf.reshape(P, [M_I, N_I])
     F = tf.reshape(F, [M_I, N_I])
