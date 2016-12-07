@@ -45,9 +45,11 @@ with tf.device('/cpu:0'):
 
         # running a session for the output
         output = tf.Variable(255*tf.random_uniform([1,224,224,3]))
+
         # initialization of all the variables
         init = tf.initialize_all_variables()
         sess.run(init)
+        #print(output.eval()[:,:10,:10,0])
         cnn = Vgg19('./vgg19.npy')
         cnn.build(output)
         out_features = [cnn.conv1_1, cnn.conv2_1, cnn.conv3_1, cnn.conv4_1, \
@@ -55,7 +57,8 @@ with tf.device('/cpu:0'):
         print("Features extraction from noise, done !")
 
         # losses for each layer
-        style_loss = style_error(art_features, out_features)
+        start = time()
+        #style_loss = style_error(art_features, out_features)
         #alpha_loss = alpha_reg(x=output, alpha=6, lambd=2.16e8)
         #beta_loss = TV_reg(x=output, beta=2, lambd=5)
         #total_loss = style_loss #+ alpha_loss + beta_loss
@@ -65,26 +68,27 @@ with tf.device('/cpu:0'):
                                                   out_features, k))
 
         sess.run(total_loss)
-        print("Loss computation, done !")
+        end = time()
+        print("Loss computation, done in {} s!".format(end-start))
 
-        # print(tf.trainable_variables())
-        #
-        # # minimization of the loss
-        # l_rate = 0.5
-        # decay = 0.9
-        # opt = tf.train.GradientDescentOptimizer(learning_rate = l_rate)
-        # loss = total_loss[layer-1]
-        # train = opt.minimize(loss)
-        # print("Gradient descent construction, done !")
+        print(tf.trainable_variables())
 
-        # # let's begin !
-        # sess.run(tf.initialize_all_variables())
-        # for step in np.arange(5):
-        #     sess.run(train)
-        #     if (step%50 == 0):
-        #         print("Optimization step : {}".format(step))
-        #     output = sess.run(variables) # update of output
-        #
-        # # display the result
-        # image_out = np.array(output)
-        # skimage.io.imsave("./images/out/output.jpg", img)
+        # minimization of the loss
+        l_rate = 0.000001
+        decay = 0.9
+        opt = tf.train.GradientDescentOptimizer(learning_rate = l_rate)
+        loss = total_loss[layer-1]
+        train = opt.minimize(loss)
+        print("Gradient descent construction, done !")
+
+        # let's begin !
+        sess.run(tf.initialize_all_variables())
+        for step in np.arange(10):
+            sess.run(train)
+            if (step%10 == 0):
+                print("Optimization step : {}".format(step))
+
+        # display the result
+        image_out = np.squeeze(sess.run(output))
+        print(image_out[:10,:10,:])
+        skimage.io.imsave("./images/out/output.jpg", image_out)
