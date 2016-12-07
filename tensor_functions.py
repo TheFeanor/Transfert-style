@@ -82,16 +82,16 @@ def alpha_reg(x, alpha, lambd):
     Computes alpha-norm-regularisation term with weight lambd
     """
     (row, col, channel)  = (int(x.get_shape()[1]), int(x.get_shape()[2]), \
-                            int(x.get_shape()[3])
+                            int(x.get_shape()[3]))
     norms = []
     norm_a = tf.zeros([1])
 
     for k in np.arange(channel):
         xt = tf.reshape(x[:,:,:,0], [row*col, 1])
         x_mean = tf.reduce_mean(xt)
-        x_c = tf.sub(xt, tf.mean(xt) * tf.ones_like(xt))
+        x_c = tf.sub(xt, x_mean * tf.ones_like(xt))
         powers = alpha * tf.ones_like(xt)
-        norms.append(tf.reduce_sum(tf.power(x_c, power)))
+        norms.append(tf.reduce_sum(tf.pow(x_c, powers)))
 
     norm_a = tf.add(tf.add(norms[0], norms[1]), norms[2])
 
@@ -103,7 +103,7 @@ def TV_reg(x, beta, lambd):
     Computes TV-regularisation term with power beta/2 and weight lambd
     """
     (row, col, channel)  = (int(x.get_shape()[1]), int(x.get_shape()[2]), \
-                            int(x.get_shape()[3])
+                            int(x.get_shape()[3]))
     norms = []
     norm_b = tf.zeros([1])
     for k in np.arange(channel):
