@@ -72,7 +72,7 @@ def structure_error(features_p, features_x, layer_index):
     P = tf.reshape(P, [M_I, N_I])
     F = tf.reshape(F, [M_I, N_I])
 
-    E = tf.nn.l2_loss(tf.sub(P,F))
+    E = tf.nn.l2_loss(tf.sub(P,F)) / tf.nn.l2_loss(P)
 
     return E
 
@@ -108,13 +108,19 @@ def TV_reg(x, beta, lambd):
     norm_b = tf.zeros([1])
     for k in np.arange(channel):
         xt = x[:,:,:,k]
-        gx = tf.sub(xt[:,1:], xt[:,:-1])
-        gy = tf.sub(xt[1:,:], xt[:-1,:])
+        gx = tf.sub(xt[:, :,1:], xt[:, :,:-1])
+        gy = tf.sub(xt[:, 1:,:], xt[:, :-1,:])
+
+        # makes gx and gy square tensors anew
+        gx2 = tf.concat(2, [gx, tf.zeros([1, row, 1])])
+        gy2 = tf.concat(1, [gy, tf.zeros([1, 1, col])])
+
         beta2 = np.float(beta)/2
         power2 = 2*tf.ones_like(xt)
         powerbeta = beta2*tf.ones_like(xt)
-        norms.append(tf.reduce_sum(tf.pow(tf.add(tf.pow(gx, power2), \
-                                tf.pow(gy, power2), powerbeta))))
+        loss_k = tf.reduce_sum(tf.pow(tf.pow(gx2, 2) \
+                                + tf.pow(gy2, 2), powerbeta))
+        norms.append(loss_k)
 
     norm_b = tf.add(tf.add(norms[0], norms[1]), norms[2])
 
