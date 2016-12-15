@@ -7,8 +7,12 @@ from tensor_functions import *
 import utils
 import skimage.io
 from time import time
+from vgg_functions import *
 
 #loading images
+image = utils.load_image("./Images/dieux_du_stade.jpg")
+print(np.amax(image))
+print(np.amin(image))
 photo = 128*(utils.load_image("./Images/dieux_du_stade.jpg")-0.5)
 #art   = 128*(utils.load_image("./Images/nuit_etoilee.jpg")-0.5)
 
@@ -33,35 +37,25 @@ lambd_a = 2.16e8
 #lambd_b = 5   # layers 7-12
 lambd_b = 50   # layers 13-20
 
-with tf.device('/cpu:0'):
-
-    # # running a session for the output
-    # output = tf.Variable(128*tf.random_uniform([1,224,224,3], \
-    #                             minval = -1, maxval = 1), name = "output")
-    # with tf.Session() as sess0:
-    #     # initialization of all the variables
-    #     init = tf.initialize_all_variables()
-    #     sess0.run(init)
-    #
-    #     saver = tf.train.Saver({'output' : output})
-    #     saver.save(sess0, filepath)
-
-
+with tf.device('/gpu:0'):
     # session : get for the painting and the photo the features from convX.1
     with tf.Session() as sess:
-        # running a session for the output
-        output = tf.Variable(128*tf.random_uniform([1,224,224,3], \
-                                    minval = -1, maxval = 1), name = "output")
 
-        init = tf.initialize_all_variables()
+        # # running a session for the output
+        # output = tf.Variable(128*tf.random_uniform([1,224,224,3], \
+        #                             minval = -1, maxval = 1), name = "output")
+
+        output_image = 128*(utils.load_image("./Images/out/output.jpg")-0.5)
+        output_image = np.reshape(output_image, (1, 224, 224, 3))
+        output = tf.Variable(tf.convert_to_tensor(output_image))
+        output = tf.cast(output, tf.float32)
+
+        init = tf.global_variables_initializer()
         sess.run(init)
 
         # running a session for photography features extraction
         image = tf.convert_to_tensor(photo_batch, dtype=tf.float32)
-        cnn = Vgg19('./vgg19.npy')
-        cnn.build(image)
-        photo_features = [cnn.conv1_1, cnn.conv2_1, cnn.conv3_1, cnn.conv4_1, \
-                       cnn.conv5_1]
+        photo_features = build(image)
         print("Features extraction from photography, done !")
 
         # # running a session for art piece features extraction
@@ -75,18 +69,9 @@ with tf.device('/cpu:0'):
 
 
         # let's begin !
-        sess.run(tf.initialize_all_variables())
-        for step in np.arange(20):
-            # # restore the value of output from output.npy
-            # new_saver = tf.train.Saver({'output' : output})
-            # new_saver.restore(sess, filepath)
-            # print("Output restored")
-
-            #print(output.eval()[:,:10,:10,0])
-            cnn = Vgg19('./vgg19.npy')
-            cnn.build(sigma*output) # to compute features of sigma * x'
-            out_features = [cnn.conv1_1, cnn.conv2_1, cnn.conv3_1, cnn.conv4_1, \
-                           cnn.conv5_1]
+        sess.run(tf.global_variables_initializer())
+        for step in np.arange(21):
+            out_features = build(sigma*output) # to compute features of sigma * x'
             #print("Features extraction from noise, done !")
 
             # losses for each layer
@@ -99,9 +84,6 @@ with tf.device('/cpu:0'):
             for k in np.arange(5):
                 total_loss.append(structure_error(photo_features, \
                                                       out_features, k))
-
-            if step % 10 == 0:
-                print("Total loss : {}".format(sess.run(total_loss[0])))
             #end = time()
             #print("Loss computation, done in {} s!".format(end-start))
 
@@ -117,7 +99,8 @@ with tf.device('/cpu:0'):
             sess.run(train)
             #new_saver.save(sess, filepath, global_step = step)
             if (step%10 == 0):
-                print("Optimization step : {}".format(step))
+                print("Optimization step : {}, total loss : {}".format(step, \
+                                            sess.run(total_loss[0])))
 
         # display the result
         image_out = 128+np.squeeze(sess.run(output))

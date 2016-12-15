@@ -4,3 +4,7 @@ custom_VGG.pyc
 tensor_test.py
 data
 test
+tensroflow_implementation/*.pyc
+caffe_implementation/VGG_ILSVRC_19_layers_deploy.prototxt
+caffe_implementation/VGG_ILSVRC_19_layers.caffemodel
+caffe_imp.py
