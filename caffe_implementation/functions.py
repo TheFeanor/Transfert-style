@@ -19,7 +19,7 @@ def style_representation(A):
     represents the amount of filter responses.
     """
     A = tf.squeeze(A)
-    row, col channel = A.shape
+    row, col, channel = A.shape
     Gram = np.matrix(np.zeros((row, col)))
 
     for i in np.arange(channel):
