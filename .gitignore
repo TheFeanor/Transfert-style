@@ -5,6 +5,4 @@ Rapport/Transfert_de_style.bbl
 Rapport/Transfert_de_style.blg
 Rapport/Transfert_de_style.log
 Rapport/Transfert_de_style.synctex.gz
-Code/Misc/former_implementations
-Code/Model
-Papers/.DS_Store
+*.DS_Store
